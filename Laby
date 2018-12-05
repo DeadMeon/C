@@ -1,0 +1,40 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+
+#define tailleLab 30
+
+
+void laby(int t, int ** tab) {
+    for (int i = 0; i < t; ++i) {
+        for (int j = 0; j < t; ++j) {
+            printf("*");
+            if (tab[i][j] = 1){
+                printf("*");
+            } else {
+                printf(" ");
+            }
+        }
+    }
+}
+
+int main() {
+    srand(time(null));
+    int ** tabLaby = (int **)malloc(tailleLab * sizeof(int *));
+    for (int i = 0; i < tailleLab; ++i) {
+        int * tabLaby[i] = (int *)malloc(tailleLab * sizeof(int));
+        for (int j = 0; j < tailleLab; ++j) {
+            tabLaby[i][j] = (rand() % 2);
+        }
+        tabLaby[0][i] = 1;
+        tabLaby[i][0] = 1;
+        tabLaby[tailleLab][i] = 1;
+        tabLaby[i][tailleLab] = 1;
+    }
+    tabLaby[(rand() % tailleLab)][0] = 1;
+    tabLaby[(rand() % tailleLab)][tailleLab] = 1;
+    tabLaby[(rand() % tailleLab)][tailleLab] = 1;
+    laby(tailleLab,tabLaby);
+    return 0;
+}
