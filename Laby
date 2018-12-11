@@ -3,38 +3,182 @@
 #include <string.h>
 #include <time.h>
 
+
+/// Variable modifiable
+
 #define tailleLab 30
 
 
-void laby(int t, int ** tab) {
-    for (int i = 0; i < t; ++i) {
-        for (int j = 0; j < t; ++j) {
-            printf("*");
-            if (tab[i][j] = 1){
-                printf("*");
-            } else {
-                printf(" ");
+/// Structure
+
+typedef struct Case Case;
+struct Case{
+    int type;
+    struct Pos;
+    int CaseDEntrer;
+    int* accesCase[4];
+};
+
+struct Pos{
+    int x;
+    int y;
+};
+
+
+
+
+/// Fonctions
+
+// affiche sur l'ecran.
+void labyPrinter(int t, int ** tab) {
+    *printf("start labyPrinter ...");
+    for (int i = 0; i < t; i++) {
+        for (int k = 0; k < 3; k++){
+            for (int j = 0; j < t; j++) {
+                dessinateur(tab[i][j], k);
             }
+            printf("\n");
         }
     }
+    printf("... end labyPrinter");
 }
 
-int main() {
-    srand(time(null));
-    int ** tabLaby = (int **)malloc(tailleLab * sizeof(int *));
-    for (int i = 0; i < tailleLab; ++i) {
-        int * tabLaby[i] = (int *)malloc(tailleLab * sizeof(int));
-        for (int j = 0; j < tailleLab; ++j) {
-            tabLaby[i][j] = (rand() % 2);
+
+
+
+// choisie au hasard un type de case qui a la meme entrer que la sortie de la case precedente.
+void randomCase(int n){
+    printf("start randomCase ...");
+    int r;
+    do{
+        r = rand()*15;
+    }while(!typeCase[r][n]);
+    printf("end randomCase");
+    return r;
+}
+
+
+// affiche le type de chaque case en fontion de leur enplacement .
+void tabPrinter(int t,int ** tabLaby){
+    printf("start tabPrinter ...");
+    for (int i = 0; i < t; i++) {
+        for (int j = 0; j < t; j++) {
+            if (tabLaby[i][j] <= 9){
+                printf(" %d ", tabLaby[i][j]);
+            } else {
+                printf("%d ", tabLaby[i][j]);
+            }
         }
-        tabLaby[0][i] = 1;
-        tabLaby[i][0] = 1;
-        tabLaby[tailleLab][i] = 1;
-        tabLaby[i][tailleLab] = 1;
+        printf("\n");
     }
-    tabLaby[(rand() % tailleLab)][0] = 1;
-    tabLaby[(rand() % tailleLab)][tailleLab] = 1;
-    tabLaby[(rand() % tailleLab)][tailleLab] = 1;
-    laby(tailleLab,tabLaby);
+    printf("\n");
+    printf("end tabPrinter");
+}
+
+
+// dessine le labyrinthe.
+void dessinateur(int n, int p){
+    printf("start dessinateur ...");
+    if (((n == 1 || n == 6 || n == 7 || n == 5 || n == 4 || n == 3 || n == 10) && p == 0)
+        ||((n == 1 || n == 8 || n == 9 || n == 5 || n == 2 || n == 4 || n == 12) && p == 2)
+        || n == 15)
+    {
+        printf("0000");
+    } else if (((n == 0 || n == 8 || n == 9 || n == 2 || n == 11 || n == 12 || n == 13 || n == 14) && p == 0)
+        ||((n == 0 || n == 2 || n == 3) && p == 1)
+        ||((n == 0 || n == 6 || n == 7 || n == 3 || n == 11 || n == 13 || n == 10 || n == 14) && p == 2))
+    {
+        printf("0  0");
+    } else if ((n == 6 || n == 8 || n == 5 || n == 11) && p == 1)
+    {
+        printf("0   ");
+    } else if ((n == 7 || n == 9 || n == 4 || n == 13) && p == 1)
+    {
+        printf("   0");
+    } else if ((n == 1 || n == 10 || n == 12 || n == 14) && p == 1)
+    {
+        printf("    ");
+    }
+    printf("... end dessinateur");
+}
+
+// Donne les sorties et entrees pour chaque type de case
+void typeDeCase(int** typeCase){
+    // 0 == up; 1 == right; 2 == down; 3 == left
+    printf("start typeDeCase ...");
+    int i = 0, j = 0;
+    while (i++ < 16){
+        while (j++ < 4){
+            if ((i == 1 && (j == 0 || j == 2))
+                || (i == 0 && (j == 1 || j == 3))
+                || (i == 2 && (j == 1 || j == 2 || j == 3))
+                || (i == 3 && (j == 0 || j == 1 || j == 3))
+                || (i == 4 && (j == 0 || j == 2 || j == 1))
+                || (i == 5 && (j == 0 || j == 2 || j == 3))
+                || (i == 6 && (j == 0 || j == 3))
+                || (i == 7 && (j == 0 || j == 1))
+                || (i == 8 && (j == 2 || j == 3))
+                || (i == 9 && (j == 2 || j == 1))
+                || (i == 10 && j == 0)
+                || (i == 11 && j == 3)
+                || (i == 12 && j == 2)
+                || (i == 13 && j == 1)
+                || (i == 15)
+                ){
+                    typeCase[i][j] = 0;
+                } else {
+                    typeCase[i][j] = 1;
+                }
+        }
+    }
+    printf("... end typeDeCase");
+}
+
+
+//initialise les tableaux.
+void init(int t,Case** tabLaby, int** typeCase){
+    printf("start init ...");
+    for (int k = 1; k < t-1; k++) {
+        tabLaby[0][k].type = 15;
+        tabLaby[k][0].type = 15;
+        tabLaby[t-1][k].type = 15;
+        tabLaby[k][t-1].type = 15;
+        for (int j = 1; j < t-1; j++) {
+            tabLaby[k][j].type = (rand() % 15);
+        }
+    }
+    tabLaby[0][0].type = 15;
+    tabLaby[0][t-1].type = 15;
+    tabLaby[t-1][0].type = 15;
+    tabLaby[t-1][t-1].type = 15;
+    tabLaby[(rand() % t-1)][0].type = 1;
+    tabLaby[(rand() % t-1)][(t-1)].type = 1;
+    tabLaby[(rand() % t-1)][(t-1)].type = 1;
+
+    typeDeCase(typeCase);
+    printf("... end init");
+}
+
+
+/// Main
+
+int main() {
+    srand(time(0));
+    Case ** tabLaby = (Case **)malloc(tailleLab * sizeof(Case *));
+    for (int i = 0; i < tailleLab; ++i) {
+        tabLaby[i] = (Case *)malloc(tailleLab * sizeof(Case));
+    }
+
+    int ** typeCase = (int **)malloc(15 * sizeof(int *));
+    for (int i = 0; i < tailleLab; ++i) {
+        typeCase[i] = (int *)malloc(15 * sizeof(int));
+    }
+
+
+    init(tailleLab, tabLaby, typeCase);
+
+
+    tabPrinter(tailleLab, tabLaby);
+    labyPrinter(tailleLab,tabLaby);
     return 0;
 }
