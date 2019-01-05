@@ -19,56 +19,9 @@ struct Case{
 
 
 
-/// modif adresse en type ...
 
 
 /// Fonctions
-
-//initialise les tableaux.
-void init(int t,Case** tabLaby, int** typeCase){
-
-    for (int k = 0; k < t; k++) {
-        tabLaby[0][k].type = 15;
-        tabLaby[k][0].type = 15;
-        tabLaby[t - 1][k].type = 15;
-        tabLaby[k][t - 1].type = 15;
-        for (int i = 0; i < 4; i++) {
-            tabLaby[0][k].accesCase[i] = 0;
-            tabLaby[k][0].accesCase[i] = 0;
-            tabLaby[t - 1][k].accesCase[i] = 0;
-            tabLaby[k][t - 1].accesCase[i] = 0;
-        }
-
-    }
-
-
-    for (int l = 1; l < t-1; l++) {
-        for (int j = 1; j < t-1; j++) {
-            tabLaby[l][j].type = 16;
-        }
-    }
-
-    tabLaby[(rand() % t-2) + 1][0].type = 1;
-    int sortie1 = (rand() % t-2) +1;
-    tabLaby[sortie1][(t-1)].type = 1;
-    int sortie2 = (rand() % t-2) +1;
-    while (sortie1 != sortie2) sortie2 = (rand() % t-2) +1;
-    tabLaby[sortie2][(t-1)].type = 1;
-    for (int i = 0; i < 4; i++) {
-
-        tabLaby[(rand() % t-1 + 1)][0].accesCase[i] = 1;
-        tabLaby[(rand() % t-1 + 1)][(t-1)].accesCase[i] = 1;
-        tabLaby[(rand() % t-1 + 1)][(t-1)].accesCase[i] = 1;
-    }
-
-    typeDeCase(typeCase);
-
-
-
-}
-
-
-
 
 
 // Donne les sorties et entrees pour chaque type de case
@@ -93,16 +46,65 @@ void typeDeCase(int** typeCase){
                 || (i == 12 && j == 2)
                 || (i == 13 && j == 1)
                 || (i == 15)
-                ){
-                    typeCase[i][j] = 0; //fermer
-                } else {
-                    typeCase[i][j] = 1; //ouvert
-                }
+                )
+            {
+                typeCase[i][j] = 0; //fermer
+            } else {
+                typeCase[i][j] = 1; //ouvert
+            }
+        }
+    }
+}
+
+
+//initialise les tableaux.
+void init(int t,Case** tabLaby, int** typeCase){
+    //creation des murs exterieurs
+    for (int k = 0; k < t; k++) {
+        tabLaby[0][k].type = 15;
+        tabLaby[k][0].type = 15;
+        tabLaby[t - 1][k].type = 15;
+        tabLaby[k][t - 1].type = 15;
+        for (int i = 0; i < 4; i++) {
+            tabLaby[0][k].accesCase[i] = 0;
+            tabLaby[k][0].accesCase[i] = 0;
+            tabLaby[t - 1][k].accesCase[i] = 0;
+            tabLaby[k][t - 1].accesCase[i] = 0;
         }
     }
 
-}
+    //mise a zero des cases
+    for (int l = 1; l < t-1; l++) {
+        for (int j = 1; j < t-1; j++) {
+            tabLaby[l][j].type = 16;
+        }
+    }
+    
+    //entrer
+    unsigned int entrer = (rand() % t-2) +1;
+    tabLaby[entrer][0].type = 1;
+    //sortie
+    unsigned int sortie1 = (rand() % t-2) +1;
+    tabLaby[sortie1][(t-1)].type = 1;
+    //sortie 2
+    unsigned int sortie2 = (rand() % t-2) +1;
+    while (sortie1 == sortie2) sortie2 = (rand() % t-2) +1;
+    tabLaby[sortie2][(t-1)].type = 1;
+    
+    printf("%d %d %d", entrer, sortie1, sortie2);
+    
+    //creation des acces au case d'entrer et de sortie
+    for (int i = 0; i < 4; i++) {
+        *tabLaby[entrer][0].accesCase[i] = 1;
+        *tabLaby[sortie1][(t-1)].accesCase[i] = 1;
+        *tabLaby[sortie2][(t-1)].accesCase[i] = 1;
+    }
 
+    
+
+
+
+}
 
 
 // choisie au hasard un type de case qui a la meme entrer que la sortie de la case precedente.
@@ -112,22 +114,18 @@ void tabFiller(int t, Case ** tab, int ** tabC){
         for(int j = 1; j < t-1; j++){
             do{
                 r = rand()%15;
-                printf("%d\n", r);
-            } while((tab[i-1][j].type != 16 && tabC[r][0] != tab[i-1][j].accesCase[2])
-                  && (tab[i][j+1].type != 16 && tabC[r][1] != tab[i][j+1].accesCase[3])
-                  && (tab[i+1][j].type != 16 && tabC[r][2] != tab[i+1][j].accesCase[0])
-                  && (tab[i][j-1].type != 16 && tabC[r][3] != tab[i][j-1].accesCase[1])
+            } while((tab[i-1][j].type != 16 && tabC[r][0] != *tab[i-1][j].accesCase[2])
+                  || (tab[i][j+1].type != 16 && tabC[r][1] != *tab[i][j+1].accesCase[3])
+                  || (tab[i+1][j].type != 16 && tabC[r][2] != *tab[i+1][j].accesCase[0])
+                  || (tab[i][j-1].type != 16 && tabC[r][3] != *tab[i][j-1].accesCase[1])
                   );
             tab[i][j].type = r;
-            for(int k = 0; k < 4; k++) tab[i][j].accesCase[k] = tabC[r][k];
-            printf("%d ", r);
+            for(int k = 0; k < 4; k++) { 
+                *tab[i][j].accesCase[k] = tabC[r][k];
+            }
         }
-        printf("\n");
     }
 }
-
-
-
 
 
 void errorCheck(int t, Case ** tab){
@@ -140,6 +138,8 @@ void errorCheck(int t, Case ** tab){
         }
     }
 }
+
+
 
 
 /// Print
@@ -162,22 +162,8 @@ void tabPrinter(int t,Case ** tabLaby){
 }
 
 
-// affiche sur l'ecran.
-void labyPrinter(int t, Case ** tab) {
-    for (int i = 0; i < t; i++) {
-        for (int k = 0; k < 3; k++){
-            for (int j = 0; j < t; j++) {
-                dessinateur(tab[i][j].type, k);
-            }
-            printf("\n");
-        }
-    }
-
-}
-
-
 // dessine le labyrinthe.
-void dessinateur(int n, int p){
+void dessin(int n, int p){
     if (((n == 1 || n == 6 || n == 7 || n == 5 || n == 4 || n == 3 || n == 10) && p == 0)
         ||((n == 1 || n == 8 || n == 9 || n == 5 || n == 2 || n == 4 || n == 12) && p == 2)
         || n == 15)
@@ -201,6 +187,22 @@ void dessinateur(int n, int p){
 }
 
 
+// affiche sur l'ecran.
+void labyPrinter(int t, Case ** tab) {
+    for (int i = 0; i < t; i++) {
+        for (int k = 0; k < 3; k++){
+            for (int j = 0; j < t; j++) {
+                dessin(tab[i][j].type, k);
+            }
+            printf("\n");
+        }
+    }
+
+}
+
+
+
+
 
 /// Main
 
@@ -217,6 +219,7 @@ int main() {
     }
 
     init(tailleLab, tabLaby, typeCase);
+    typeDeCase(typeCase);
     tabFiller(tailleLab, tabLaby, typeCase);
     errorCheck(tailleLab, tabLaby);
 
