@@ -27,41 +27,43 @@ struct Case{
 //initialise les tableaux.
 void init(int t,Case** tabLaby, int** typeCase){
 
-    for (int k = 1; k < t-1; k++) {
+    for (int k = 0; k < t; k++) {
         tabLaby[0][k].type = 15;
         tabLaby[k][0].type = 15;
-        tabLaby[t-1][k].type = 15;
-        tabLaby[k][t-1].type = 15;
+        tabLaby[t - 1][k].type = 15;
+        tabLaby[k][t - 1].type = 15;
         for (int i = 0; i < 4; i++) {
             tabLaby[0][k].accesCase[i] = 0;
             tabLaby[k][0].accesCase[i] = 0;
-            tabLaby[t-1][k].accesCase[i] = 0;
-            tabLaby[k][t-1].accesCase[i] = 0;
+            tabLaby[t - 1][k].accesCase[i] = 0;
+            tabLaby[k][t - 1].accesCase[i] = 0;
         }
+
+    }
+
+
+    for (int l = 1; l < t-1; l++) {
         for (int j = 1; j < t-1; j++) {
-            tabLaby[k][j].type = 16;
+            tabLaby[l][j].type = 16;
         }
     }
-    tabLaby[0][0].type = 15;
-    tabLaby[0][t-1].type = 15;
-    tabLaby[t-1][0].type = 15;
-    tabLaby[t-1][t-1].type = 15;
-    tabLaby[(rand() % t-1)][0].type = 1;
-    tabLaby[(rand() % t-1)][(t-1)].type = 1;
-    tabLaby[(rand() % t-1)][(t-1)].type = 1;
+
+    tabLaby[(rand() % t-2) + 1][0].type = 1;
+    int sortie1 = (rand() % t-2) +1;
+    tabLaby[sortie1][(t-1)].type = 1;
+    int sortie2 = (rand() % t-2) +1;
+    while (sortie1 != sortie2) sortie2 = (rand() % t-2) +1;
+    tabLaby[sortie2][(t-1)].type = 1;
     for (int i = 0; i < 4; i++) {
-        tabLaby[0][0].accesCase[i] = 0;
-        tabLaby[0][t-1].accesCase[i] = 0;
-        tabLaby[t-1][0].accesCase[i] = 0;
-        tabLaby[t-1][t-1].accesCase[i] = 0;
-        tabLaby[(rand() % t-1)][0].accesCase[i] = 1;
-        tabLaby[(rand() % t-1)][(t-1)].accesCase[i] = 1;
-        tabLaby[(rand() % t-1)][(t-1)].accesCase[i] = 1;
+
+        tabLaby[(rand() % t-1 + 1)][0].accesCase[i] = 1;
+        tabLaby[(rand() % t-1 + 1)][(t-1)].accesCase[i] = 1;
+        tabLaby[(rand() % t-1 + 1)][(t-1)].accesCase[i] = 1;
     }
 
     typeDeCase(typeCase);
 
-    tabFiller(t, tabLaby, typeCase);
+
 
 }
 
@@ -109,14 +111,14 @@ void tabFiller(int t, Case ** tab, int ** tabC){
     for (int i = 1; i < t-1; i++){
         for(int j = 1; j < t-1; j++){
             do{
-                r = rand()*15;
-            }
-            while((tab[i-1][j].type == 16 || tabC[r][0] == tab[i-1][j].accesCase[0])
-                  && (tab[i][j+1].type == 16 || tabC[r][1] == tab[i][j+1].accesCase[1])
-                  && (tab[i+1][j].type == 16 || tabC[r][2] == tab[i+1][j].accesCase[2])
-                  && (tab[i][j-1].type == 16 || tabC[r][3] == tab[i][j-1].accesCase[3])
+                r = rand()%15;
+            } while((tab[i-1] [j].type != 16 || tabC[r][0] != tab[i-1][j].accesCase[2])
+                  && (tab[i][j+1].type != 16 || tabC[r][1] != tab[i][j+1].accesCase[3])
+                  && (tab[i+1][j].type != 16 || tabC[r][2] != tab[i+1][j].accesCase[0])
+                  && (tab[i][j-1].type != 16 || tabC[r][3] != tab[i][j-1].accesCase[1])
                   );
             tab[i][j].type = r;
+            for(int k = 0; k < 4; k++) tab[i][j].accesCase[k] = tabC[r][k];
             printf("%d ", r);
         }
         printf("\n");
@@ -131,7 +133,7 @@ void errorCheck(int t, Case ** tab){
     for (int i = 0; i < t; i++){
         for (int j = 0; j < t; j++){
             if (tab[i][j].type == 16){
-                printf("//// ERROR \\\\ \n//// CHECK \\\\");
+                printf(" ---- ERROR ---- \n ---- CHECK ---- \n %d %d",i,j);
                 exit(0);
             }
         }
@@ -214,6 +216,7 @@ int main() {
     }
 
     init(tailleLab, tabLaby, typeCase);
+    tabFiller(tailleLab, tabLaby, typeCase);
     errorCheck(tailleLab, tabLaby);
 
     tabPrinter(tailleLab, tabLaby);
