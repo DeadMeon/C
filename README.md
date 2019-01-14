@@ -1,4 +1,4 @@
 # C
 
-## Laby v1.0
+## Laby v1.1
 ### Version fonctionnel
