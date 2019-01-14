@@ -1,13 +1,13 @@
 // M'Hirsi Aziz et YOUNSI Tayssir
 
 /**
- * Nous nous sommes basée sur l'idée que l'on crée une valeur, ici appellé 'check' dans la sructrure Case, qui sera
- * differente dans toute les cases.
- * Puis dés que l'on ouvre une porte entre deux cases, on mets check a la valeur la plus basse des deux.
- * Et tant que toutes les cases sont differentes de zero, on continue.
+ * Nous nous sommes basée sur l'idée que l'on crée une valeur, ici appelé 'check' dans la structure Case, qui sera
+ * différents dans toutes les cases.
+ * Puis dés que l'on ouvre une porte entre deux cases, on met check a la valeur la plus basse des deux.
+ * Et tant que toutes les cases sont différentes de zéro, on continue.
  *
- * Une fois cela fait on va utiliser une tableau de reference appeller 'typeCase' qui va permettre de convertir les
- * portes en une valeur numerique appeller 'type' pour pouvoir le dessier et soius forme de dessin.
+ * Une fois cela fait on va utiliser un tableau de référence appelé 'typeCase' qui va permettre de convertir les
+ * portes en une valeur numérique appeler 'type' pour pouvoir le dessiner et sous forme de dessin.
  *
  */
 
@@ -48,8 +48,7 @@ void typeDeCase(int** typeCase){
                 || (i == 11 && j == 3)
                 || (i == 12 && j == 2)
                 || (i == 13 && j == 1)
-                || (i == 15)
-                )
+                || (i == 15))
             {
                 typeCase[i][j] = 0; //fermer
             } else {
@@ -96,7 +95,7 @@ void init(int t,Case** tabLaby, int** typeCase){
     for (int l = 1; l < t-1; l++) {
         for (int j = 1; j < t-1; j++) {
             tabLaby[l][j].type = 16;
-            tabLaby[l][j].check = ((l-1)*(t-2))+(j-1);
+            tabLaby[l][j].check = ((l-1)*(t-2))+(j-1)+3;
             tabLaby[l][j].up = 0;
             tabLaby[l][j].right = 0;
             tabLaby[l][j].down = 0;
@@ -109,15 +108,18 @@ void init(int t,Case** tabLaby, int** typeCase){
     unsigned int entrer = (rand() % (t-2)) +1;
     tabLaby[entrer][0].type = 1;
     tabLaby[entrer][0].check = 0;
+    tabLaby[entrer][1].check = 0;
     //sortie
     unsigned int sortie1 = (rand() % (t-2)) +1;
     tabLaby[sortie1][(t-1)].type = 1;
-    tabLaby[sortie1][(t-1)].check = 0;
+    tabLaby[sortie1][(t-1)].check = 1;
+    tabLaby[sortie1][(t-2)].check = 1;
     //sortie 2
     unsigned int sortie2 = (rand() % (t-2)) +1;
     while (sortie1 == sortie2) sortie2 = (rand() % (t-2)) +1;
     tabLaby[sortie2][(t-1)].type = 1;
-    tabLaby[sortie2][(t-1)].check = 0;
+    tabLaby[sortie2][(t-1)].check = 2;
+    tabLaby[sortie2][(t-2)].check = 2;
 
     //creation des acces au case d'entrer et de sortie
     tabLaby[entrer][0].right = 1;
@@ -126,7 +128,7 @@ void init(int t,Case** tabLaby, int** typeCase){
 
     tabLaby[sortie1][(t-1)].right = 1;
     tabLaby[sortie1][(t-1)].left = 1;
-    tabLaby[sortie2][(t-2)].right = 1;
+    tabLaby[sortie1][(t-2)].right = 1;
 
     tabLaby[sortie2][(t-1)].right = 1;
     tabLaby[sortie2][(t-1)].left = 1;
@@ -135,9 +137,9 @@ void init(int t,Case** tabLaby, int** typeCase){
 
 // verifie qu'il existe un lien entre toutes les cases
 int checkDoor(int t, Case ** tabLaby){
-    for (int i = 1; i < t-1; i++){
-        for(int j = 1; j < t-1; j++){
-            if (tabLaby[i][j].check != 0) return 0;
+    for (int i = 0; i < t; i++){
+        for(int j = 0; j < t; j++){
+            if (tabLaby[i][j].check != 0 && tabLaby[i][j].check != -1) return 0;
         }
     }
 
@@ -199,8 +201,8 @@ void openWall(int t, Case ** tabLaby){
                 c2 = tabLaby[x1][y1].check;
             }
             //mets toute les case liee au porte egale a la nouvelle valeur de check
-            for (int i = 1; i < (t-1); i++) {
-                for (int j = 1; j < (t-1); j++) {
+            for (int i = 0; i < t; i++) {
+                for (int j = 0; j < t; j++) {
                     if (tabLaby[i][j].check == c1) tabLaby[i][j].check = c2;
                 }
             }
@@ -222,9 +224,9 @@ void tabFiller(int t, Case ** tab, int ** tabC){
         for(int j = 1; j < t-1; j++){
             r = 0;
             while(tabC[r][0] != tab[i][j].up
-            || (tabC[r][1] != tab[i][j].right)
-            || (tabC[r][2] != tab[i][j].down)
-            || (tabC[r][3] != tab[i][j].left))
+                  || (tabC[r][1] != tab[i][j].right)
+                  || (tabC[r][2] != tab[i][j].down)
+                  || (tabC[r][3] != tab[i][j].left))
             {
                 r++;
                 if (r == 16) {
@@ -275,6 +277,21 @@ void tabPrinter(int t,Case ** tabLaby){
                 printf("  %d", tabLaby[i][j].type);
             } else {
                 printf(" %d", tabLaby[i][j].type);
+            }
+        }
+        printf("\n");
+    }
+    printf("\n");
+    // imprime les valeurs de check en fonction de leur emplacement
+    printf("\n");
+    for (int i = 0; i < t; i++) {
+        for (int j = 0; j < t; j++) {
+            if (tabLaby[i][j].check <= 9 && tabLaby[i][j].check >= 0){
+                printf("   %d", tabLaby[i][j].check);
+            } else if (tabLaby[i][j].check <= 99 || tabLaby[i][j].check <= 0){
+                printf("  %d", tabLaby[i][j].check);
+            } else {
+                printf(" %d", tabLaby[i][j].check);
             }
         }
         printf("\n");
@@ -347,29 +364,39 @@ void labyPrinter(int t, Case ** tab) {
 int main() {
     srand(time(NULL));
 
-    //Tableeu contemant le labyrinthe
+    ///Tableeu contemant le labyrinthe
     Case ** tabLaby = (Case **)malloc(tailleLab * sizeof(Case *));
     for (int i = 0; i < tailleLab; ++i) {
         tabLaby[i] = (Case *)malloc(tailleLab * sizeof(Case));
     }
 
-    //Tableau qui definit les type de case en fonction de leur entrées et sorties
+    ///Tableau qui definit les type de case en fonction de leur entrées et sorties
     int ** typeCase = (int **)malloc(16 * sizeof(int *));
     for (int i = 0; i < 16; ++i) {
         typeCase[i] = (int *)malloc(4 * sizeof(int));
     }
 
-    //initialisation
+    ///initialisation
     init(tailleLab, tabLaby, typeCase);
     typeDeCase(typeCase);
-
-    //Remplie les tableaux
+    
+    ///Remplie les tableaux
     openWall(tailleLab, tabLaby);
     tabFiller(tailleLab, tabLaby, typeCase);
     errorCheck(tailleLab, tabLaby);
 
-    //dessine le layrinthe
+    ///dessine le layrinthe
+    //tabPrinter(tailleLab, tabLaby);
     labyPrinter(tailleLab,tabLaby);
 
+    ///Libere la memoire des tableaux en memoire
+    for (int j = 0; j < tailleLab; j++) {
+        free(tabLaby[j]);
+    }
+    free(tabLaby);
+    for (int j = 0; j < 16; j++) {
+        free(typeCase[j]);
+    }
+    free(typeCase);
     return 0;
 }
